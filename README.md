@@ -4,7 +4,7 @@ The API for simulate Library service with REST Pattern architecture acept the GE
 ## ℹ️  GETTING STARTED
 ### PREREQUISITES 
 - Java 18+
-- IntelliJ
+- IntelliJ 2021.3.3
 
 ### INSTALATION
 1. Open your terminal in location that you want save the project.
@@ -13,6 +13,15 @@ The API for simulate Library service with REST Pattern architecture acept the GE
 git clone https://github.com/PaoloProdossimoLopes/java-library-api-demo.git
 ```
 3. Open project folder with IDE
+
+## 📦 Dependencies
+- SpringBoot Developer tool
+- SpringBoot Web
+- SpringBoot JPA
+- JUnit 5
+- H2 DataBase
+- Lombok
+
    
 ### RUN
 So that you can run the project follow this steps:
