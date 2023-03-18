@@ -17,7 +17,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book save(Book book) {
-        if (repository.existsISBN(book.getIsbn())) throw new BussinessException("Already have a other book with this ISBN");
+        if (repository.existsByIsbn(book.getIsbn())) throw new BussinessException("Already have a other book with this ISBN");
         return repository.save(book);
     }
 }
