@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.regex.Matcher;
+
 @WebMvcTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -46,11 +48,7 @@ public class BookControllerTests {
         Book book = makeBook(bookDTO);
         mockServiceResponse(book);
 
-        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .post(BOOK_API)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .content(json);
+        MockHttpServletRequestBuilder request = mockRequest(json);
 
         mvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
@@ -62,8 +60,13 @@ public class BookControllerTests {
 
     @Test
     @DisplayName("Deve lancar erro de validaçao quando nao houver dados suficientes para a criaçao do livro.")
-    void createInvalidBookTest() {
+    void createInvalidBookTest() throws Exception {
 
+        String json = new ObjectMapper().writeValueAsString(new BookDTO());
+        MockHttpServletRequestBuilder request = mockRequest(json);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     private BookDTO makeBookDTO() {
@@ -89,5 +92,13 @@ public class BookControllerTests {
 
     private void mockServiceResponse(Book book) {
         BDDMockito.given(service.save(Mockito.any(Book.class))).willReturn(book);
+    }
+
+    private MockHttpServletRequestBuilder mockRequest(String json) {
+        return MockMvcRequestBuilders
+                .post(BOOK_API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
     }
 }
