@@ -2,8 +2,10 @@ package com.paoloprodossimolopes.libraryapidemo.api.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paoloprodossimolopes.libraryapidemo.api.dto.BookDTO;
+import com.paoloprodossimolopes.libraryapidemo.api.exceptions.BussinessException;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +71,20 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
+    @Test
+    @DisplayName("Deve lancar erro ao tentar cadastrar um livro com isbn utilizado por outro")
+    void createBookWithDuplicatedIsbn() throws Exception {
+        String errrorMessage = "Already have a other book with this ISBN";
+        mockResponse().willThrow(new BussinessException(errrorMessage));
+        BookDTO dto = makeBookDTO();
+        String json = makeJSONString(dto);
+
+        mvc.perform(mockRequest(json))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("errors", Matchers.hasSize(1)))
+                .andExpect(MockMvcResultMatchers.jsonPath("errors[0]").value(errrorMessage));
+    }
+
     private BookDTO makeBookDTO() {
         return BookDTO.builder()
                 .title("any book title")
@@ -92,6 +108,10 @@ public class BookControllerTests {
 
     private void mockServiceResponse(Book book) {
         BDDMockito.given(service.save(Mockito.any(Book.class))).willReturn(book);
+    }
+
+    private BDDMockito.BDDMyOngoingStubbing<Book> mockResponse() {
+        return BDDMockito.given(service.save(Mockito.any(Book.class)));
     }
 
     private MockHttpServletRequestBuilder mockRequest(String json) {

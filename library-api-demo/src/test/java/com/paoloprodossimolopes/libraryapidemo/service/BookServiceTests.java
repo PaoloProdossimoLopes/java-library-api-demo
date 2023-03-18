@@ -1,5 +1,6 @@
 package com.paoloprodossimolopes.libraryapidemo.service;
 
+import com.paoloprodossimolopes.libraryapidemo.api.exceptions.BussinessException;
 import com.paoloprodossimolopes.libraryapidemo.api.model.repository.BookRepository;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.api.service.implementation.BookServiceImpl;
@@ -9,7 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -42,6 +45,18 @@ public class BookServiceTests {
         Assertions.assertEquals(saved.getIsbn(), book.getIsbn());
     }
 
+    @Test
+    @DisplayName("Dee lancar BussnessExpcetion ao tentar salvar um livro com ISBN duplicado")
+    void shouldNotSaveBookWithDuplicatedISBN() {
+        Book book = makeBook();
+        Mockito.when(repository.existsISBN(Mockito.anyString())).thenReturn(true);
+        Exception exc = Assertions.assertThrows(BussinessException.class, () -> service.save(book) );
+
+        Assertions.assertInstanceOf(BussinessException.class, exc);
+        Assertions.assertEquals(exc.getMessage(), "Already have a other book with this ISBN");
+        Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
     private Book makeBook() {
         return Book.builder()
                 .isbn("any valid isbn")
@@ -60,7 +75,12 @@ public class BookServiceTests {
     }
 
     private void mockRepositoryResponse(Book book, Book mocked) {
-        Mockito.when(repository.save(book)).thenReturn(mocked);
+        OngoingStubbing<Book> saveMocked = getSaveMethodMocked(book);
+        saveMocked.thenReturn(mocked);
     }
 
+    private OngoingStubbing<Book> getSaveMethodMocked(Book book) {
+        OngoingStubbing<Book> saveMocked = Mockito.when(repository.save(book));
+        return saveMocked;
+    }
 }

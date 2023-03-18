@@ -1,6 +1,7 @@
 package com.paoloprodossimolopes.libraryapidemo.api.resource;
 
 import com.paoloprodossimolopes.libraryapidemo.api.dto.BookDTO;
+import com.paoloprodossimolopes.libraryapidemo.api.exceptions.BussinessException;
 import com.paoloprodossimolopes.libraryapidemo.api.exceptions.InvalidParamsException;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;
@@ -32,10 +33,18 @@ public class BookController {
         return mapper.map(savedBook, BookDTO.class);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     InvalidParamsException handleValidationExpeptions(MethodArgumentNotValidException exeption) throws Exception{
         BindingResult result = exeption.getBindingResult();
         return new InvalidParamsException(result);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BussinessException.class)
+    InvalidParamsException handleBussinessExpecetion(BussinessException exeption) throws Exception {
+        return new InvalidParamsException(exeption);
     }
 }
