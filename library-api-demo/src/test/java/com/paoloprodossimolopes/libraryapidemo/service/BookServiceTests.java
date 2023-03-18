@@ -36,7 +36,7 @@ public class BookServiceTests {
         Book book = makeBook();
         Book bookMocked =  makeBookFromDataBase(book);
         mockRepositoryResponse(book, bookMocked);
-
+        Mockito.when(repository.existsISBN(Mockito.anyString())).thenReturn(false);
         Book saved = service.save(book);
 
         Assertions.assertEquals(saved.getId(), bookMocked.getId());
