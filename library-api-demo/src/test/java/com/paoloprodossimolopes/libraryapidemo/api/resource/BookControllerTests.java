@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paoloprodossimolopes.libraryapidemo.api.dto.BookDTO;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @WebMvcTest
 @AutoConfigureMockMvc
@@ -45,10 +41,10 @@ public class BookControllerTests {
     void createBookTests() throws Exception {
 
         BookDTO bookDTO = makeBookDTO();
-        String json = new ObjectMapper().writeValueAsString(bookDTO);
+        String json = makeJSONString(bookDTO);
 
-        Book bookModel = makeBook(bookDTO);
-        BDDMockito.given(service.save(Mockito.any(Book.class))).willReturn(bookModel);
+        Book book = makeBook(bookDTO);
+        mockServiceResponse(book);
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(BOOK_API)
@@ -58,10 +54,16 @@ public class BookControllerTests {
 
         mvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("id").value(bookModel.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("id").value(book.getId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("title").value(bookDTO.getTitle()))
                 .andExpect(MockMvcResultMatchers.jsonPath("author").value(bookDTO.getAuthor()))
                 .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(bookDTO.getIsbn()));
+    }
+
+    @Test
+    @DisplayName("Deve lancar erro de validaçao quando nao houver dados suficientes para a criaçao do livro.")
+    void createInvalidBookTest() {
+
     }
 
     private BookDTO makeBookDTO() {
@@ -77,14 +79,15 @@ public class BookControllerTests {
                 .title(dto.getTitle())
                 .author(dto.getAuthor())
                 .isbn(dto.getIsbn())
-                .id(1l)
+                .id(1L)
                 .build();
     }
 
+    private String makeJSONString(BookDTO bookDTO) throws Exception {
+        return new ObjectMapper().writeValueAsString(bookDTO);
+    }
 
-    @Test
-    @DisplayName("Deve lancar erro de validaçao quando nao houver dados suficientes para a criaçao do livro.")
-    void createInvalidBookTest() {
-
+    private void mockServiceResponse(Book book) {
+        BDDMockito.given(service.save(Mockito.any(Book.class))).willReturn(book);
     }
 }

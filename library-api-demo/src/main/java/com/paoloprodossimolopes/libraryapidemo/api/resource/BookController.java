@@ -12,7 +12,7 @@ public class BookController {
 
     private BookService service;
 
-    BookController(BookService service) {
+    public BookController(BookService service) {
         this.service = service;
     }
 
