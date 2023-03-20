@@ -62,4 +62,15 @@ public class BookController {
         final Book book = mapper.map(getBookByID(id), Book.class);
         service.delete(book);
     }
+
+    @PutMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    BookDTO update(@PathVariable Long id, @RequestBody BookDTO dto) {
+        Book book = mapper.map(getBookByID(id), Book.class);
+        book.setAuthor(dto.getAuthor());
+        book.setTitle(dto.getTitle());
+        book.setIsbn(dto.getIsbn());
+        book = service.update(book);
+        return mapper.map(book, BookDTO.class);
+    }
 }

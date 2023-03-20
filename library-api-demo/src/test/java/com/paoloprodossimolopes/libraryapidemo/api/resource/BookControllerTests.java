@@ -147,6 +147,49 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
+    @Test
+    @DisplayName("Deve atualizar o livro")
+    void updateBookToTest() throws Exception {
+        final Book book = makeBook(makeBookDTO());
+        final BookDTO newBook = BookDTO.builder().id(book.getId()).title("any new name").isbn("any new valid isbn").author("any valid new author").build();
+        final String json = makeJSONString(newBook);
+        BDDMockito.given(service.getByID(book.getId())).willReturn(Optional.of(newBook));
+        BDDMockito.given(service.update(Mockito.any())).willReturn(Book.builder().id(book.getId()).title("any new name").isbn("any new valid isbn").author("any valid new author").build());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + book.getId()))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("id").value(book.getId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("title").value(newBook.getTitle()))
+                .andExpect(MockMvcResultMatchers.jsonPath("isbn").value(newBook.getIsbn()))
+                .andExpect(MockMvcResultMatchers.jsonPath("author").value(newBook.getAuthor()))
+        ;
+    }
+
+    @Test
+    @DisplayName("Deve retornar 404 ao atualizar um livro inesistente")
+    void updateBookFailsToTest() throws Exception {
+        final Book book = makeBook(makeBookDTO());
+        final BookDTO newBook = BookDTO.builder().id(book.getId()).title("any new name").isbn("any new valid isbn").author("any valid new author").build();
+        final String json = makeJSONString(newBook);
+        BDDMockito.given(service.getByID(Mockito.anyLong())).willReturn(Optional.empty());
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + book.getId()))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+        ;
+    }
+
     private BookDTO makeBookDTO() {
         return BookDTO.builder()
                 .title("any book title")
