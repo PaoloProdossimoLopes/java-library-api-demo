@@ -19,10 +19,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @WebMvcTest
@@ -131,6 +133,18 @@ public class BookControllerTests {
 
         mvc.perform(request)
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Deve retornara not found quando deletar e nao encontara o ID")
+    void deleiversNotFoundWhenDeletesWithInvalidID() throws Exception {
+        BDDMockito.given(service.getByID(Mockito.anyLong())).willReturn(Optional.empty());
+        RequestBuilder request = MockMvcRequestBuilders
+                .delete(BOOK_API.concat("/1"))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     private BookDTO makeBookDTO() {

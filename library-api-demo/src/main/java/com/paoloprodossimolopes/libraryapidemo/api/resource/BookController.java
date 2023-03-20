@@ -59,7 +59,7 @@ public class BookController {
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteByID(@PathVariable Long id) {
-        final Book book = mapper.map(service.getByID(id).get(), Book.class);
+        final Book book = mapper.map(getBookByID(id), Book.class);
         service.delete(book);
     }
 }
