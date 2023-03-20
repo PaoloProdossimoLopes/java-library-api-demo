@@ -6,6 +6,8 @@ import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class BookServiceImpl implements BookService {
 
@@ -19,5 +21,10 @@ public class BookServiceImpl implements BookService {
     public Book save(Book book) {
         if (repository.existsByIsbn(book.getIsbn())) throw new BussinessException("Already have a other book with this ISBN");
         return repository.save(book);
+    }
+
+    @Override
+    public Optional<Object> getByID(Long id) {
+        return Optional.empty();
     }
 }

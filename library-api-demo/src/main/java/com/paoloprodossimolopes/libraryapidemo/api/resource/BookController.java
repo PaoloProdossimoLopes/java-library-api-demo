@@ -16,9 +16,8 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
-
-    private BookService service;
-    private ModelMapper mapper;
+    private final BookService service;
+    private final ModelMapper mapper;
 
     public BookController(BookService service, ModelMapper mapper) {
         this.service = service;
@@ -46,5 +45,13 @@ public class BookController {
     @ExceptionHandler(BussinessException.class)
     InvalidParamsException handleBussinessExpecetion(BussinessException exeption) throws Exception {
         return new InvalidParamsException(exeption);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("{id}")
+    BookDTO getBookByID(@PathVariable Long id) {
+        final Object obj = service.getByID(id).get();
+        final Book book = mapper.map(obj, Book.class);
+        return mapper.map(book, BookDTO.class);
     }
 }
