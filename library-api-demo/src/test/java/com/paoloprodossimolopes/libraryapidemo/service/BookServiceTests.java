@@ -1,6 +1,5 @@
 package com.paoloprodossimolopes.libraryapidemo.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paoloprodossimolopes.libraryapidemo.api.exceptions.BussinessException;
 import com.paoloprodossimolopes.libraryapidemo.api.model.repository.BookRepository;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
