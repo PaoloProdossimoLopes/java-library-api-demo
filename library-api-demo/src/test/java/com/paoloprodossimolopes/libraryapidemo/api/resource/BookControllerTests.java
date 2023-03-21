@@ -30,10 +30,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.util.Arrays;
 import java.util.Optional;
 
-@WebMvcTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @ExtendWith(SpringExtension.class)
+@WebMvcTest(controllers = BookController.class)
 public class BookControllerTests {
 
     static String BOOK_API = "/api/books";
