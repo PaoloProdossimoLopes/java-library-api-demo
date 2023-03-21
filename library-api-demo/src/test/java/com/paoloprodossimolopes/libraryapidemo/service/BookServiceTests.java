@@ -1,5 +1,6 @@
 package com.paoloprodossimolopes.libraryapidemo.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paoloprodossimolopes.libraryapidemo.api.exceptions.BussinessException;
 import com.paoloprodossimolopes.libraryapidemo.api.model.repository.BookRepository;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
@@ -13,8 +14,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -56,6 +65,56 @@ public class BookServiceTests {
         Mockito.verify(repository, Mockito.never()).save(book);
     }
 
+    @Test
+    @DisplayName("Deve obter um livro por ID")
+    void getByIDTest() {
+        Long id = 1L;
+        Book book = makeBook();
+        book.setId(id);
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+
+        Optional<Object> foundObject = service.getByID(id);
+//        Book foundBook = new ObjectMapper().convertValue(foundObject, Book.class);
+//
+//        Assertions.assertTrue(foundObject.isPresent());
+//        Assertions.assertEquals(foundBook.getId(), book.getId());
+//        Assertions.assertEquals(foundBook.getTitle(), book.getTitle());
+//        Assertions.assertEquals(foundBook.getAuthor(), book.getAuthor());
+//        Assertions.assertEquals(foundBook.getIsbn(), book.getIsbn());
+    }
+
+    @Test
+    @DisplayName("Deve retornar vazio quando obter um livro nao cadastrado na base")
+    void getNullByIDTest() {
+        Long id = 1L;
+        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+
+        Optional<Object> object = service.getByID(id);
+
+        Assertions.assertFalse(object.get() == null);
+    }
+
+    @Test
+    @DisplayName("Deve filtrar livros pelas props")
+    void findBookTest() {
+        final Book book = makeBook();
+        final List<Book> books = Arrays.asList(book);
+        final int currentPage = 0;
+        final int totalElementsOnPage = 1;
+        final int totalElememtsDelivers = 1;
+        final PageRequest pageRequest = PageRequest.of(currentPage, totalElementsOnPage);
+        final Page<Book> page = new PageImpl<Book>(books, pageRequest, totalElememtsDelivers);
+        Mockito
+                .when(repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+                .thenReturn(page);
+
+        final Page<Book> result = service.find(book, pageRequest);
+
+        Assertions.assertEquals(result.getTotalElements(), totalElememtsDelivers);
+        Assertions.assertEquals(result.getContent(), books);
+        Assertions.assertEquals(result.getPageable().getPageNumber(), currentPage);
+        Assertions.assertEquals(result.getPageable().getPageSize(), totalElementsOnPage);
+    }
     private Book makeBook() {
         return Book.builder()
                 .isbn("any valid isbn")

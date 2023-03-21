@@ -6,6 +6,9 @@ import com.paoloprodossimolopes.libraryapidemo.api.exceptions.InvalidParamsExcep
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
@@ -54,6 +59,18 @@ public class BookController {
         return service.getByID(id)
                 .map(book -> mapper.map(book, BookDTO.class))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public Page<BookDTO> find(BookDTO dto, Pageable page) {
+        Book filterBook = mapper.map(dto, Book.class);
+        Page<Book> result = service.find(filterBook, page);
+        List<BookDTO> list = result.getContent()
+                .stream()
+                .map(entity -> mapper.map(entity, BookDTO.class))
+                .collect(Collectors.toList());
+        return new PageImpl<BookDTO>(list, page, result.getTotalElements());
     }
 
     @DeleteMapping("{id}")
