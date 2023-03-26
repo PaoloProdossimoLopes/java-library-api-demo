@@ -2,7 +2,7 @@ package com.paoloprodossimolopes.libraryapidemo.api.resource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paoloprodossimolopes.libraryapidemo.api.dto.LoanDTO;
-import com.paoloprodossimolopes.libraryapidemo.api.model.Loan;
+import com.paoloprodossimolopes.libraryapidemo.model.entity.Loan;
 import com.paoloprodossimolopes.libraryapidemo.api.service.BookService;
 import com.paoloprodossimolopes.libraryapidemo.api.service.LoanService;
 import com.paoloprodossimolopes.libraryapidemo.model.entity.Book;

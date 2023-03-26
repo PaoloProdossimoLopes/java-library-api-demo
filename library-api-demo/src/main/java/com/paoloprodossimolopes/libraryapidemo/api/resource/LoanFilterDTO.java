@@ -1,4 +1,4 @@
-package com.paoloprodossimolopes.libraryapidemo.api.dto;
+package com.paoloprodossimolopes.libraryapidemo.api.resource;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,11 +6,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class LoanDTO {
+@NoArgsConstructor
+@Builder
+public class LoanFilterDTO {
+
     private String isbn;
     private String customer;
-    private BookDTO book;
+
 }
